@@ -52,8 +52,8 @@ int main(string[] args) {
         "complete|C", "Complete todo, use as '--complete ID'", &complete,
         "uncomplete|U", "Reopens todo, use as '--uncomplete ID'", &uncomplete,
         "title|t", "Sets title", &title,
-        "description|d", 
-            "Can be used with --add and --edit to set description", 
+        "description|d",
+            "Can be used with --add and --edit to set description",
             &description,
         "repo|r", "Sets todo repository in 'OWNER/REPO' format. Required only once", &setRepo,
         "verbose|v", "For debug purposes, prints verbose curs requests", &verbose
@@ -71,7 +71,7 @@ int main(string[] args) {
     if (setRepo != "") {
         writeText(repoPath.fixPath, setRepo);
     }
-    
+
     string repo = readText(repoPath.fixPath).replace("\n", "");
     if (repo.length == 0) {
         writeln("Error: please set todo repository with '--repo' flag.");
@@ -82,7 +82,7 @@ int main(string[] args) {
             return 1;
         }
     }
-    
+
     string token = readText(tokenPath.fixPath).replace("\n", "");
 
     string[string] head = [
@@ -99,14 +99,14 @@ int main(string[] args) {
     JSONValue j;
 
     auto thenFunc = delegate void(string data) {
-        j = parseJSON(data); 
+        j = parseJSON(data);
     };
- 
+
     if (doList) {
         string query = "";
         if (listClosed) query ~= "state=closed";
         if (listAll) query ~= "state=all";
-        
+
         fetch("https://api.github.com/repos/" ~ repo ~ "/issues?" ~ query, conf).then(thenFunc).except(errorFunc);
 
         if (j.array.length == 0) {
@@ -144,7 +144,7 @@ int main(string[] args) {
             writeln("Cannot create empty task without a title.");
             return 1;
         }
-        
+
         string bdy = "{\"title\": \"" ~ title ~ "\"";
         if (description.length) bdy ~= ",\"body\":\"" ~ description ~ "\"";
         bdy ~= "}";
@@ -187,7 +187,7 @@ int main(string[] args) {
         string bdy = "{\"title\": \"" ~ title ~ "\"";
         if (description.length) bdy ~= ",\"body\":\"" ~ description ~ "\"";
         bdy ~= "}";
-        
+
         conf.method = PATCH;
         conf.data = bdy;
 
@@ -203,7 +203,7 @@ int main(string[] args) {
 
     if (complete != -1) {
         string bdy = "{\"state\":\"closed\",\"state_reason\":\"completed\"}";
-        
+
         conf.method = PATCH;
         conf.data = bdy;
 
@@ -230,7 +230,7 @@ int main(string[] args) {
         return 0;
     }
 
-    
+
     return 0;
 }
 
