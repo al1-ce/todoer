@@ -18,7 +18,7 @@ import core.stdc.stdlib: exit;
 import sily.curl;
 import sily.getopt;
 import std.path : absolutePath, buildNormalizedPath, expandTilde;
-import sily.path: fixPath;
+import sily.path: buildAbsolutePath;
 
 auto errorFunc = delegate void(HTTPStatusException e) {
     printError(e);
@@ -69,10 +69,10 @@ int main(string[] args) {
     checkPath();
 
     if (setRepo != "") {
-        writeText(repoPath.fixPath, setRepo);
+        writeText(repoPath.buildAbsolutePath, setRepo);
     }
 
-    string repo = readText(repoPath.fixPath).replace("\n", "");
+    string repo = readText(repoPath.buildAbsolutePath).replace("\n", "");
     if (repo.length == 0) {
         writeln("Error: please set todo repository with '--repo' flag.");
         return 1;
@@ -83,7 +83,7 @@ int main(string[] args) {
         }
     }
 
-    string token = readText(tokenPath.fixPath).replace("\n", "");
+    string token = readText(tokenPath.buildAbsolutePath).replace("\n", "");
 
     string[string] head = [
         "Accept": "application/vnd.github+json",
@@ -260,15 +260,15 @@ string repoPath = "~/.config/todoer/repo";
 string repoPathOnly = "~/.config/todoer";
 
 void checkPath() {
-    if (!tokenPath.fixPath.exists()) {
+    if (!tokenPath.buildAbsolutePath.exists()) {
         writeln("Error: please generate your github token. Refer to 'Generating token' section in readme.");
         exit(1);
     }
-    if (!repoPathOnly.fixPath.exists()) {
-        mkdir(repoPathOnly.fixPath);
+    if (!repoPathOnly.buildAbsolutePath.exists()) {
+        mkdir(repoPathOnly.buildAbsolutePath);
     }
-    if (!repoPath.fixPath.exists()) {
-        File f = File(repoPath.fixPath, "w+");
+    if (!repoPath.buildAbsolutePath.exists()) {
+        File f = File(repoPath.buildAbsolutePath, "w+");
         f.close();
     }
 }
